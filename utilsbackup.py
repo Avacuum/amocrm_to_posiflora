@@ -189,7 +189,7 @@ def generate_posi_json(amo_json, item_data, spec_items):
     print(card_text)
     epoch_delivery_date = find_field(amo_json, "Дата доставки", False)
     if epoch_delivery_date:
-        delivery_date = datetime.datetime.fromtimestamp(epoch_delivery_date, datetime.timezone.utc).strftime("%Y-%m-%d")
+        delivery_date = datetime.datetime.fromtimestamp(epoch_delivery_date, datetime.timezone.utc).strftime("%Y.%m.%d")
     else:
         delivery_date = "Не указана"
     print(delivery_date)
@@ -206,7 +206,7 @@ def generate_posi_json(amo_json, item_data, spec_items):
                 "date": "{datetime.date.today()}",
                 "description": "{payment_method}",
                 "budget": 0,
-                "dueTime": "{delivery_date}T{offset_delivery_time}+06:00",
+                "dueTime": "{datetime.datetime.fromtimestamp(amo_json['created_at'], datetime.timezone.utc).isoformat('T', 'seconds')}",
                 "delivery": "true",
                 "deliveryComments": "{comment}. Дата доставки: {delivery_date}. Текст открытки: {card_text}",
                 "deliveryCity": "",
@@ -319,6 +319,8 @@ def get_specifications_items(specification_ids):
                 break
         else:
             bouquet_id = '503aeee2-4947-45f0-bcdd-273be0fc4df4'
+
+        bouquet_data = requests.get(url=posiflora_get_orders_url, headers=headers)
         items = []
         i = 0
         while i < len(res.json()["included"]) - 1:
@@ -358,7 +360,7 @@ def get_specifications_items(specification_ids):
             '''
             response.append(json_pattern)
             respon = ','.join(response)
-        final_json.append(respon)
+            final_json.append(respon)
     f = ','.join(final_json)
     return f, bouquets_price
 

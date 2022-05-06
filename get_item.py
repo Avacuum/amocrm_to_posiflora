@@ -7,7 +7,10 @@ dotenv_path = '.env'
 load_dotenv(dotenv_path)
 
 amo_base_url = os.environ.get("AMO_BASE_URL")
-endpoint = '/api/v4/leads/30467665'
+item_id = 986945
+catalog_id = 6305
+
+endpoint = f'/api/v4/catalogs/{catalog_id}/elements/{item_id}'
 access_token = os.environ.get("AMO_ACCESS_TOKEN")
 method = 'GET'
 
@@ -16,13 +19,14 @@ headers = {
     'Authorization': 'Bearer {}'.format(access_token)
 }
 params = {
-    'with': 'catalog_elements, contacts'
+    'with': 'catalog_elements'
 }
 
 res = requests.get(url=amo_base_url+endpoint, headers=headers, params=params)
 a = res.json()
-catalog_id = a["_embedded"]["catalog_elements"][0]["metadata"]["catalog_id"]
-item_id = a["_embedded"]["catalog_elements"][0]["metadata"]["price_id"]
-print(a)
-print(catalog_id)
-print(item_id)
+
+item_name = a["name"]
+item_price = a["custom_fields_values"][1]["values"][0]["value"]
+item_posi_id = a["custom_fields_values"][0]["values"][0]["value"]
+print(a, item_price, item_name, item_posi_id)
+
